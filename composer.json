@@ -1,0 +1,16 @@
+{
+    "name": "datweb/vo",
+    "description": "Objetos de Valor (VO)",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Datweb\\Vo\\": "src/"
+        }
+    },
+    "require": {
+        "php": "~8.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.4"
+    }
+}
