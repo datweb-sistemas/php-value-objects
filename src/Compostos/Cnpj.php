@@ -14,7 +14,11 @@ readonly class Cnpj extends ValueObject implements PII
 
     public function __construct(string $value, bool $validate = true)
     {
-        $this->value = preg_replace('/\D/', '', $value);
+        $cleanValue = preg_replace('/\D/', '', $value);
+        if (strlen($cleanValue) < self::LENGTH) {
+            $cleanValue = str_pad($cleanValue, self::LENGTH, '0', STR_PAD_LEFT);
+        }
+        $this->value = $cleanValue;
 
         if ($validate && !$this->isValid()) {
             throw new InvalidArgumentException("Invalid Cnpj.");

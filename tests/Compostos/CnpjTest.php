@@ -14,14 +14,32 @@ class CnpjTest extends TestCase
     #[DataProvider('validCnpjProvider')]
     public function testValidCnpj(string $input, string $expectedFormatted): void
     {
+        $cleanValue = preg_replace('/\D/', '', $input);
+        $cleanValue = str_pad($cleanValue, Cnpj::LENGTH, '0', STR_PAD_LEFT);
+
         $cnpj = new Cnpj($input);
         $this->assertTrue($cnpj->isValid(), "O CNPJ {$input} deveria ser válido.");
         $this->assertEquals($expectedFormatted, $cnpj->getFormatted(), "O CNPJ formatado não corresponde ao esperado.");
         $this->assertEquals(
-            preg_replace('/\D/', '', $input),
+            $cleanValue,
             $cnpj->value(),
             "O valor armazenado do CNPJ não corresponde ao esperado."
         );
+    }
+
+    public static function validCnpjProvider(): array
+    {
+        return [
+            ['11222333000181', '11.222.333/0001-81'],
+            ['00.310.333/0001-17', '00.310.333/0001-17'],
+            ['310.333/0001-17', '00.310.333/0001-17'],//pad zeros
+            ['11444777000161', '11.444.777/0001-61'],
+            ['401033070001-32', '40.103.307/0001-32'],
+            ['12345678/000195', '12.345.678/0001-95'],
+            ['12672297/000110', '12.672.297/0001-10'],
+            ['40.688.134/0001-61', '40.688.134/0001-61'],
+            ['40688134000161', '40.688.134/0001-61'],
+        ];
     }
 
     #[DataProvider('invalidCnpjProvider')]
@@ -43,18 +61,6 @@ class CnpjTest extends TestCase
         );
     }
 
-    public static function validCnpjProvider(): array
-    {
-        return [
-            ['11222333000181', '11.222.333/0001-81'],
-            ['11444777000161', '11.444.777/0001-61'],
-            ['401033070001-32', '40.103.307/0001-32'],
-            ['12345678/000195', '12.345.678/0001-95'],
-            ['12672297/000110', '12.672.297/0001-10'],
-            ['40.688.134/0001-61', '40.688.134/0001-61'],
-            ['40688134000161', '40.688.134/0001-61'],
-        ];
-    }
 
     public static function invalidCnpjProvider(): array
     {

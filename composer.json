@@ -1,16 +1,19 @@
 {
-    "name": "datweb/vo",
-    "description": "Objetos de Valor (VO)",
-    "type": "library",
-    "autoload": {
-        "psr-4": {
-            "Datweb\\Vo\\": "src/"
-        }
-    },
-    "require": {
-        "php": "~8.2"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^11.4"
+  "name": "datweb/vo",
+  "description": "Objetos de Valor (VO)",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "Datweb\\Vo\\": "src/"
     }
+  },
+  "require": {
+    "php": "~8.3",
+    "ext-mbstring": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.4",
+    "ext-iconv": "*",
+    "php-mock/php-mock-phpunit": "^2.10"
+  }
 }

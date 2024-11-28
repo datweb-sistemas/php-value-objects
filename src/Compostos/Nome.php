@@ -46,6 +46,21 @@ readonly class Nome extends ValueObject implements PII
 
     private function normalize(string $nome): string
     {
-        return ucwords(strtolower(preg_replace('/\s+/', ' ', trim($nome))));
+        $excecoes = ['da', 'de', 'do', 'dos', 'das'];
+
+        $string = preg_replace('/\s+/', ' ', trim(strtolower($nome)));
+
+        $partes = array_values(array_filter(explode(' ', $string)));
+
+        $partes = array_map(function ($parte) use ($excecoes) {
+            // Verifica se a palavra está na lista de exceções
+            if (in_array($parte, $excecoes)) {
+                return $parte;
+            } else {
+                return ucwords($parte);
+            }
+        }, $partes);
+
+        return implode(' ', $partes);
     }
 }

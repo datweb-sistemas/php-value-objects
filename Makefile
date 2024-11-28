@@ -1,8 +1,8 @@
 # Makefile
 
 # Definição de variáveis
-IMAGE_NAME = php-xdebug82:local
-CONTAINER_NAME = php-xdebug82-container
+IMAGE_NAME = php-xdebug83:local
+CONTAINER_NAME = php-xdebug83-container
 APP_DIR = $(shell pwd)
 WORKDIR = /app
 

@@ -31,10 +31,27 @@ class EmailTest extends TestCase
     }
 
     #[DataProvider('validEmailProvider')]
-    public function testIsValidReturnsTrueForValidEmails(string $emailString)
+    public function testIsValidReturnsTrueForValidEmails(string $emailString, string $expected)
     {
-        $email = new Email($emailString, false); // Desativa validação no construtor
+        $email = new Email($emailString, true);
         $this->assertTrue($email->isValid(), "Falha ao validar e-mail: $emailString");
+        $this->assertEquals($expected, $email->value());
+    }
+
+    public static function validEmailProvider(): array
+    {
+        return [
+            ["usuario@exemplo.com", "usuario@exemplo.com"],
+            ["USUARIO@EXemplo.com", "usuario@exemplo.com"],
+            ["USER.NAME+tag@sub.exemplo.co.uk", "user.name+tag@sub.exemplo.co.uk"],
+            ["usuario123@exemplo.io", "usuario123@exemplo.io",],
+            ["usuario_name@exemplo.org", "usuario_name@exemplo.org",],
+            ["usuario-name@exemplo.net", "usuario-name@exemplo.net",],
+            ["user.name+tag+sorting@example.com", "user.name+tag+sorting@example.com",],
+            ["x@example.com", "x@example.com",],
+            ["example-indeed@strange-example.com", "example-indeed@strange-example.com",],
+            ["user%example.com@example.org", "user%example.com@example.org",],
+        ];
     }
 
 
@@ -76,21 +93,6 @@ class EmailTest extends TestCase
             $email->isValid(),
             "Validade esperada: " . ($expectedValidity ? 'Válido' : 'Inválido') . " para: $emailString"
         );
-    }
-
-    public static function validEmailProvider(): array
-    {
-        return [
-            ["usuario@exemplo.com"],
-            ["USER.NAME+tag@sub.exemplo.co.uk"],
-            ["usuario123@exemplo.io"],
-            ["usuario_name@exemplo.org"],
-            ["usuario-name@exemplo.net"],
-            ["user.name+tag+sorting@example.com"],
-            ["x@example.com"],
-            ["example-indeed@strange-example.com"],
-            ["user%example.com@example.org"],
-        ];
     }
 
     public static function invalidEmailProvider(): array
