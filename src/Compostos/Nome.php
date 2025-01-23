@@ -39,6 +39,18 @@ readonly class Nome extends ValueObject implements PII
         return array_values(array_filter(explode(' ', $this->value)));
     }
 
+    use \Datweb\Vo\PIITrait;
+
+    public function mask(): string
+    {
+        return substr($this->primeiroNome(), 0, 2) . '****';
+    }
+
+    protected function getMaskPattern(): string
+    {
+        return '/^(.{2})(.+)$/';
+    }
+
     public function value(): string
     {
         return $this->value;

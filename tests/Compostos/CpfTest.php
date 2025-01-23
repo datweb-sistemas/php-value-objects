@@ -55,6 +55,31 @@ class CpfTest extends TestCase
         $this->assertEquals('12345678900', $cpf->value(), "O valor armazenado do CPF está incorreto.");
     }
 
+    public function testMaskHidesSensitivePortions(): void
+    {
+        $cpf = new Cpf('12345678901', false);
+        $this->assertEquals('***.***.***.01', $cpf->mask());
+    }
+
+    public function testGetAuditLogReturnsCorrectFormat(): void
+    {
+        $cpf = new Cpf('82095443063', false);
+        $log = $cpf->getAuditLog();
+
+        $this->assertArrayHasKey('type', $log);
+        $this->assertArrayHasKey('masked_value', $log);
+        $this->assertArrayHasKey('timestamp', $log);
+        $this->assertArrayHasKey('operation', $log);
+        
+        $this->assertEquals('CPF', $log['type']);
+        $this->assertEquals('***.***.***.63', $log['masked_value']);
+        $this->assertEquals('create', $log['operation']);
+        
+        // Test operation tracking
+        $cpf->value();
+        $this->assertEquals('create', $cpf->getAuditLog()['operation']);
+    }
+
     public static function invalidCpfProvider(): array
     {
         return [

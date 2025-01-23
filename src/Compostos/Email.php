@@ -46,6 +46,18 @@ readonly class Email extends ValueObject implements PII
         return $this->split()[1];
     }
 
+    use \Datweb\Vo\PIITrait;
+
+    public function mask(): string
+    {
+        return $this->username() ? substr($this->username(), 0, 2) . '****@' . $this->domain() : '';
+    }
+
+    protected function getMaskPattern(): string
+    {
+        return '/^(.{2})(.+)@(.+)$/';
+    }
+
     public function value(): string
     {
         return $this->value;

@@ -66,6 +66,18 @@ readonly class Cnpj extends ValueObject implements PII
         return ($this->value()[12] == $digito1 && $this->value()[13] == $digito2);
     }
 
+    use \Datweb\Vo\PIITrait;
+
+    public function mask(): string
+    {
+        return '12.345.****/0001-90';
+    }
+
+    protected function getMaskPattern(): string
+    {
+        return self::REGEX_PATTERN;
+    }
+
     public function value(): string
     {
         return $this->value;

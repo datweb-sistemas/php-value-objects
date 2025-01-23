@@ -11,7 +11,6 @@ readonly class Cpf extends ValueObject implements PII
 {
     public const int LENGTH = 11;
     public const string REGEX_PATTERN = '/^(\d{3})(\d{3})(\d{3})(\d{2})$/';
-
     protected string $value;
 
     public function __construct(#[SensitiveParameter] string $value, bool $validate = true)
@@ -66,6 +65,18 @@ readonly class Cpf extends ValueObject implements PII
         }
 
         return true;
+    }
+
+    use \Datweb\Vo\PIITrait;
+
+    public function mask(): string
+    {
+        return '***.***.***.'.substr($this->value(), -2);
+    }
+
+    protected function getMaskPattern(): string
+    {
+        return self::REGEX_PATTERN;
     }
 
     public function value(): string
