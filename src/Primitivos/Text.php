@@ -6,7 +6,7 @@ use Datweb\Vo\Encoding;
 use Datweb\Vo\ValueObject;
 use InvalidArgumentException;
 
-/**@codeCoverageIgnore */
+/** @codeCoverageIgnore */
 readonly class Text extends ValueObject
 {
     private string $value;

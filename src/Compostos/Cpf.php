@@ -5,14 +5,16 @@ namespace Datweb\Vo\Compostos;
 use Datweb\Vo\PII;
 use Datweb\Vo\ValueObject;
 use InvalidArgumentException;
+use SensitiveParameter;
 
 readonly class Cpf extends ValueObject implements PII
 {
-    public const LENGTH = 11;
-    public const REGEX_PATTERN = '/^([\d]{3})([\d]{3})([\d]{3})([\d]{2})$/';
+    public const int LENGTH = 11;
+    public const string REGEX_PATTERN = '/^(\d{3})(\d{3})(\d{3})(\d{2})$/';
+
     protected string $value;
 
-    public function __construct(string $value, bool $validate = true)
+    public function __construct(#[SensitiveParameter] string $value, bool $validate = true)
     {
         $cleanValue = preg_replace('/\D/', '', $value);
         if (strlen($cleanValue) < self::LENGTH) {
@@ -32,23 +34,37 @@ readonly class Cpf extends ValueObject implements PII
 
     public function isValid(): bool
     {
-        if (strlen($this->value()) !== self::LENGTH) {
-            return false;
-        }
-        if (preg_match('/(\d)\1{10}/', $this->value())) {
-            return false;
-        }
+        return $this->hasValidLength()
+            && $this->hasUniqueDigits()
+            && $this->hasValidCheckDigits();
+    }
 
-        // Faz o calculo para validar o CPF
+    private function hasValidLength(): bool
+    {
+        return strlen($this->value()) === self::LENGTH;
+    }
+
+    private function hasUniqueDigits(): bool
+    {
+        return !preg_match('/^(\d)\1{10}$/', $this->value());
+    }
+
+    private function hasValidCheckDigits(): bool
+    {
         for ($t = 9; $t < 11; $t++) {
-            for ($d = 0, $c = 0; $c < $t; $c++) {
-                $d += $this->value()[$c] * (($t + 1) - $c);
+            $sum = 0;
+            for ($c = 0; $c < $t; $c++) {
+                $sum += (int)$this->value()[$c] * (($t + 1) - $c);
             }
-            $d = ((10 * $d) % 11) % 10;
-            if ($this->value()[$c] != $d) {
+
+            $remainder = ($sum * 10) % 11;
+            $calculatedDigit = $remainder === 10 ? 0 : $remainder;
+
+            if ((int)$this->value()[$c] !== $calculatedDigit) {
                 return false;
             }
         }
+
         return true;
     }
 
