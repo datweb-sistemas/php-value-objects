@@ -15,5 +15,16 @@
     "phpunit/phpunit": "^11.4",
     "ext-iconv": "*",
     "php-mock/php-mock-phpunit": "^2.10"
-  }
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/package-versions-deprecated": true
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://api.github.com/repos/datweb-sistemas/php-value-objects/contents"
+    }
+  ]
 }
