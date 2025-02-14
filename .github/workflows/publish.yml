@@ -1,0 +1,38 @@
+name: Publish Package to GitHub Packages
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, iconv
+      
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+      
+      - name: Configure GitHub Packages
+        run: |
+          composer config github-oauth.github.com "${{ secrets.GITHUB_TOKEN }}"
+          composer config repositories.github '{"type": "composer", "url": "https://api.github.com/repos/datweb-sistemas/php-value-objects/contents"}'
+          composer config repositories.packagist false
+      
+      - name: Build and publish package
+        run: |
+          composer config version ${GITHUB_REF#refs/tags/}
+          composer config --unset repositories.packagist
+          composer config repositories.github composer https://api.github.com/repos/datweb-sistemas/php-value-objects/contents
+          composer config repositories.packagist.org composer https://packagist.org
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
