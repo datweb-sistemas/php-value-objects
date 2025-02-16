@@ -38,6 +38,20 @@ class EmailTest extends TestCase
         $this->assertEquals($expected, $email->value());
     }
 
+    public function testMaskHidesSensitivePortions(): void
+    {
+        $email = new Email('usuario@exemplo.com', false);
+        $this->assertEquals('***@exemplo.com', $email->getMasked());
+        $this->assertEquals('u******@exemplo.com', $email->getPartiallyMasked());
+    }
+
+    public function testMaskHidesSensitivePortionsMin(): void
+    {
+        $email = new Email('u@exemplo.com', false);
+        $this->assertEquals('***@exemplo.com', $email->getMasked());
+        $this->assertEquals('u@exemplo.com', $email->getPartiallyMasked());
+    }
+
     public static function validEmailProvider(): array
     {
         return [

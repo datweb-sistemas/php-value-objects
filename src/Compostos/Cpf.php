@@ -2,12 +2,12 @@
 
 namespace Datweb\Vo\Compostos;
 
-use Datweb\Vo\PII;
+use Datweb\Vo\MaskablePII;
 use Datweb\Vo\ValueObject;
 use InvalidArgumentException;
 use SensitiveParameter;
 
-readonly class Cpf extends ValueObject implements PII
+readonly class Cpf extends ValueObject implements MaskablePII
 {
     public const int LENGTH = 11;
     public const string REGEX_PATTERN = '/^(\d{3})(\d{3})(\d{3})(\d{2})$/';
@@ -32,16 +32,26 @@ readonly class Cpf extends ValueObject implements PII
         return preg_replace(self::REGEX_PATTERN, '$1.$2.$3-$4', $this->value());
     }
 
+    private function hasValidLength(): bool
+    {
+        return strlen($this->value()) === self::LENGTH;
+    }
+
+    public function getMasked(): string
+    {
+        return '***.***.***-**';
+    }
+
+    public function getPartiallyMasked(): string
+    {
+        return preg_replace(self::REGEX_PATTERN, '***.***.${3}-${4}', $this->value());
+    }
+
     public function isValid(): bool
     {
         return $this->hasValidLength()
             && $this->hasUniqueDigits()
             && $this->hasValidCheckDigits();
-    }
-
-    private function hasValidLength(): bool
-    {
-        return strlen($this->value()) === self::LENGTH;
     }
 
     private function hasUniqueDigits(): bool

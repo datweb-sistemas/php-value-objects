@@ -102,8 +102,21 @@ class NomeTest extends TestCase
         $this->assertEquals($expectedSobrenome, $nome->sobrenome());
     }
 
-    // Data Providers
+    public function testMaskHidesSensitivePortions(): void
+    {
+        $nome = new Nome('Luiz Gustavo Almeida');
+        $this->assertEquals('*** *** ***', $nome->getMasked());
+        $this->assertEquals('Luiz *** Almeida', $nome->getPartiallyMasked());
+    }
 
+    public function testMaskHidesSensitivePortionsMin(): void
+    {
+        $nome = new Nome('Pedro');
+        $this->assertEquals('*** *** ***', $nome->getMasked());
+        $this->assertEquals('Pedro', $nome->getPartiallyMasked());
+    }
+
+    // Data Providers
     public static function nomeProvider(): array
     {
         return [

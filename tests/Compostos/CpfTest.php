@@ -26,6 +26,13 @@ class CpfTest extends TestCase
         );
     }
 
+    public function testMaskHidesSensitivePortions(): void
+    {
+        $cpf = new Cpf('12345678901', false);
+        $this->assertEquals('***.***.***-**', $cpf->getMasked());
+        $this->assertEquals('***.***.789-01', $cpf->getPartiallyMasked());
+    }
+
     public static function validCpfProvider(): array
     {
         return [

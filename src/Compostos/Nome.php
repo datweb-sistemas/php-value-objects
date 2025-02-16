@@ -2,14 +2,15 @@
 
 namespace Datweb\Vo\Compostos;
 
-use Datweb\Vo\PII;
+use Datweb\Vo\MaskablePII;
 use Datweb\Vo\ValueObject;
+use SensitiveParameter;
 
-readonly class Nome extends ValueObject implements PII
+readonly class Nome extends ValueObject implements MaskablePII
 {
     protected string $value;
 
-    public function __construct(string $nome)
+    public function __construct(#[SensitiveParameter] string $nome)
     {
         $this->value = $this->normalize($nome);
     }
@@ -32,6 +33,23 @@ readonly class Nome extends ValueObject implements PII
     {
         $split = $this->split();
         return end($split) ?: '';
+    }
+
+    public function getMasked(): string
+    {
+        return '*** *** ***';
+    }
+
+    public function getPartiallyMasked(): string
+    {
+        $partes = $this->split();
+        if (count($partes) <= 1) {
+            return $this->primeiroNome();
+        }
+
+        $primeiro = $this->primeiroNome();
+        $ultimo = $this->ultimoNome();
+        return $primeiro . ' *** ' . $ultimo;
     }
 
     public function split(): array

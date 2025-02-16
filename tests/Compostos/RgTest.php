@@ -27,6 +27,20 @@ class RgTest extends TestCase
         $this->assertEquals(trim($rgValue), $rg->value());
     }
 
+    public function testMaskHidesSensitivePortions(): void
+    {
+        $rg = new Rg('12345678901');
+        $this->assertEquals('***********', $rg->getMasked());
+        $this->assertEquals('*********01', $rg->getPartiallyMasked());
+    }
+
+    public function testMaskHidesSensitivePortionsMin(): void
+    {
+        $rg = new Rg('12');
+        $this->assertEquals('**', $rg->getMasked());
+        $this->assertEquals('12', $rg->getPartiallyMasked());
+    }
+
     public function testRgValueImmutability()
     {
         $rg = new Rg('987654321');

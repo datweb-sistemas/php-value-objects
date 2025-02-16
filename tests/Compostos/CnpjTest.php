@@ -3,6 +3,7 @@
 namespace Compostos;
 
 use Datweb\Vo\Compostos\Cnpj;
+use Datweb\Vo\Compostos\Cpf;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -25,6 +26,13 @@ class CnpjTest extends TestCase
             $cnpj->value(),
             "O valor armazenado do CNPJ não corresponde ao esperado."
         );
+    }
+
+    public function testMaskHidesSensitivePortions(): void
+    {
+        $cnpj = new Cnpj('11222333000181', false);
+        $this->assertEquals('**.***.***/****-**', $cnpj->getMasked());
+        $this->assertEquals('**.***.***/0001-81', $cnpj->getPartiallyMasked());
     }
 
     public static function validCnpjProvider(): array

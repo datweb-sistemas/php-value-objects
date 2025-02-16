@@ -2,11 +2,11 @@
 
 namespace Datweb\Vo\Compostos;
 
-use Datweb\Vo\PII;
+use Datweb\Vo\MaskablePII;
 use Datweb\Vo\ValueObject;
 use InvalidArgumentException;
 
-readonly class Cnpj extends ValueObject implements PII
+readonly class Cnpj extends ValueObject implements MaskablePII
 {
     public const LENGTH = 14;
     public const REGEX_PATTERN = '/^([\d]{2})([\d]{3})([\d]{3})([\d]{4})([\d]{2})$/';
@@ -28,6 +28,16 @@ readonly class Cnpj extends ValueObject implements PII
     public function getFormatted(): string
     {
         return preg_replace(self::REGEX_PATTERN, '$1.$2.$3/$4-$5', $this->value());
+    }
+
+    public function getMasked(): string
+    {
+        return '**.***.***/****-**';
+    }
+
+    public function getPartiallyMasked(): string
+    {
+        return preg_replace(self::REGEX_PATTERN, '**.***.***/$4-$5', $this->value());
     }
 
     public function isValid(): bool

@@ -2,11 +2,11 @@
 
 namespace Datweb\Vo\Compostos;
 
-use Datweb\Vo\PII;
+use Datweb\Vo\MaskablePII;
 use Datweb\Vo\ValueObject;
 use InvalidArgumentException;
 
-readonly class Email extends ValueObject implements PII
+readonly class Email extends ValueObject implements MaskablePII
 {
     protected string $value;
 
@@ -19,6 +19,24 @@ readonly class Email extends ValueObject implements PII
         }
     }
 
+    public function getMasked(): string
+    {
+        return '***@' . $this->domain();
+    }
+
+    public function getPartiallyMasked(): string
+    {
+        $username = $this->username();
+        $domain = $this->domain();
+
+        if (strlen($username) <= 1) {
+            return $this->value();
+        }
+
+        $maskedUsername = $username[0] . str_repeat('*', strlen($username) - 1);
+        return $maskedUsername . '@' . $domain;
+    }
+
     public function isValid(): bool
     {
         if (!filter_var($this->value(), FILTER_VALIDATE_EMAIL)) {
@@ -29,11 +47,7 @@ readonly class Email extends ValueObject implements PII
         $tld = end($domainParts);
 
         $tldLength = strlen($tld);
-        if ($tldLength < 2 || $tldLength > 10) {
-            return false;
-        }
-
-        return true;
+        return !($tldLength < 2 || $tldLength > 10);
     }
 
     public function username(): string
