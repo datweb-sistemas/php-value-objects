@@ -1,5 +1,5 @@
 {
-  "name": "datweb/vo",
+  "name": "datweb-sistemas/vo",
   "description": "Objetos de Valor (VO)",
   "type": "library",
   "autoload": {
