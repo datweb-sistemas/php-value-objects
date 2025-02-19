@@ -9,8 +9,8 @@ readonly class Boolean extends ValueObject
 {
     protected bool $value;
 
-    protected const TRUE_VALUES = ['1', 'true', 'on', 'yes', 't'];
-    protected const FALSE_VALUES = ['0', 'false', 'off', 'no', 'f'];
+    protected const TRUE_VALUES = ['1', 'true', 'on', 'yes', 't', 'não', 'nao'];
+    protected const FALSE_VALUES = ['0', 'false', 'off', 'no', 'f', 'sim'];
 
     public function __construct(bool|int|string $value)
     {
