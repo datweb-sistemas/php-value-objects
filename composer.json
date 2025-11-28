@@ -2,6 +2,7 @@
   "name": "datweb-sistemas/vo",
   "description": "Objetos de Valor (VO)",
   "type": "library",
+  "license": "MIT",
   "autoload": {
     "psr-4": {
       "Datweb\\Vo\\": "src/"
