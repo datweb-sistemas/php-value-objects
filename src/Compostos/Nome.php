@@ -1,5 +1,4 @@
 <?php
-
 namespace Datweb\Vo\Compostos;
 
 use Datweb\Vo\MaskablePII;
@@ -9,6 +8,8 @@ use SensitiveParameter;
 readonly class Nome extends ValueObject implements MaskablePII
 {
     protected string $value;
+
+    private const PREPOSICOES = ['da', 'de', 'do', 'dos', 'das'];
 
     public function __construct(#[SensitiveParameter] string $nome)
     {
@@ -35,6 +36,39 @@ readonly class Nome extends ValueObject implements MaskablePII
         return end($split) ?: '';
     }
 
+    public function abreviado(int $maxCaracteres = 30): string
+    {
+        // Se o nome já está dentro do limite, retorna completo
+        if (mb_strlen($this->value) <= $maxCaracteres) {
+            return $this->value;
+        }
+
+        $partes = $this->split();
+
+        // Se tem menos de 3 partes, trunca o nome
+        if (count($partes) < 3) {
+            return mb_substr($this->value, 0, $maxCaracteres);
+        }
+
+        $resultado = [$this->primeiroNome()];
+
+        // Abrevia os nomes do meio (exceto preposições e o último nome)
+        for ($i = 1; $i < count($partes) - 1; $i++) {
+            $parte = $partes[$i];
+
+            if (in_array(mb_strtolower($parte), self::PREPOSICOES)) {
+                $resultado[] = $parte; // Mantém preposições completas
+            } else {
+                $resultado[] = mb_strtoupper(mb_substr($parte, 0, 1)) . '.'; // Abrevia
+            }
+        }
+
+        // Adiciona o último nome completo
+        $resultado[] = $this->ultimoNome();
+
+        return implode(' ', $resultado);
+    }
+
     public function getMasked(): string
     {
         return '*** *** ***';
@@ -43,12 +77,14 @@ readonly class Nome extends ValueObject implements MaskablePII
     public function getPartiallyMasked(): string
     {
         $partes = $this->split();
+
         if (count($partes) <= 1) {
             return $this->primeiroNome();
         }
 
         $primeiro = $this->primeiroNome();
         $ultimo = $this->ultimoNome();
+
         return $primeiro . ' *** ' . $ultimo;
     }
 
@@ -64,19 +100,16 @@ readonly class Nome extends ValueObject implements MaskablePII
 
     private function normalize(string $nome): string
     {
-        $excecoes = ['da', 'de', 'do', 'dos', 'das'];
-
         $string = preg_replace('/\s+/', ' ', trim(strtolower($nome)));
-
         $partes = array_values(array_filter(explode(' ', $string)));
 
-        $partes = array_map(function ($parte) use ($excecoes) {
+        $partes = array_map(function ($parte) {
             // Verifica se a palavra está na lista de exceções
-            if (in_array($parte, $excecoes)) {
+            if (in_array($parte, self::PREPOSICOES, true)) {
                 return $parte;
-            } else {
-                return ucwords($parte);
             }
+
+            return ucwords($parte);
         }, $partes);
 
         return implode(' ', $partes);

@@ -116,6 +116,25 @@ class NomeTest extends TestCase
         $this->assertEquals('Pedro', $nome->getPartiallyMasked());
     }
 
+    #[DataProvider('abreviadoProvider')]
+    public function testAbreviado(string $input, int $maxCaracteres, string $expected): void
+    {
+        $nome = new Nome($input);
+        $this->assertEquals($expected, $nome->abreviado($maxCaracteres));
+    }
+
+    public function testAbreviadoComValorPadrao(): void
+    {
+        $nome = new Nome('Maria Fernanda Costa Oliveira');
+        $this->assertEquals('Maria Fernanda Costa Oliveira', $nome->abreviado());
+    }
+
+    public function testAbreviadoNomeLongoDemais(): void
+    {
+        $nome = new Nome('Maria Fernanda Costa Santos Oliveira');
+        $this->assertEquals('Maria F. C. S. Oliveira', $nome->abreviado());
+    }
+
     // Data Providers
     public static function nomeProvider(): array
     {
@@ -190,6 +209,38 @@ class NomeTest extends TestCase
                 "Silva",
                 "Henrique da Silva"
             ],
+        ];
+    }
+
+    public static function abreviadoProvider(): array
+    {
+        return [
+            // Nome curto, retorna completo
+            ['João Silva', 30, 'João Silva'],
+            // Nome exatamente no limite (18 caracteres em UTF-8)
+            ['João Carlos Silva', 18, 'João Carlos Silva'],
+            // Nome longo, abrevia nomes do meio
+            ['João Carlos Silva', 16, 'João C. Silva'],
+            // Nome com múltiplos nomes do meio
+            ['Maria Fernanda Costa Oliveira', 20, 'Maria F. C. Oliveira'],
+            // Nome com preposição (mantém preposição completa)
+            ['Pedro Henrique da Silva', 20, 'Pedro H. da Silva'],
+            // Nome com preposição "de"
+            ['José Carlos de Souza', 15, 'José C. de Souza'],
+            // Nome com preposição "do"
+            ['Antonio Fernando do Nascimento', 20, 'Antonio F. do Nascimento'],
+            // Nome com preposição "dos"
+            ['Carlos Alberto dos Santos', 20, 'Carlos A. dos Santos'],
+            // Nome com preposição "das"
+            ['Ana Maria das Flores', 15, 'Ana M. das Flores'],
+            // Nome único - retorna truncado (menos de 3 partes, usa mb_substr)
+            ['Sócrates', 5, 'Sócr'],
+            // Nome com dois elementos - trunca (mb_substr)
+            ['João Silva', 5, 'João'],
+            // Nome com limite muito pequeno
+            ['Maria Fernanda Costa', 10, 'Maria F. Costa'],
+            // Nome longo com muitos nomes do meio
+            ['José Carlos Alberto Pereira Santos', 25, 'José C. A. P. Santos'],
         ];
     }
 }
